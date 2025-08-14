@@ -1,12 +1,12 @@
 FROM node
-MAINTAINER jaga santagostino <kandros5591@gmail.com>
+MAINTAINER jaga santagostino <hassanomar4700@gmail.com>
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app
+COPY package.json app/ /usr/src/app
 RUN npm install
-COPY . /usr/src/app
+COPY app/ /usr/src/app
 
 ENV NODE_ENV development
 
