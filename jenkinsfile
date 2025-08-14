@@ -19,7 +19,7 @@ pipeline {
         stage('Build Web Container') {
             steps {
                 sh '''
-                docker build -t web-app -f Dockerfile-development .
+                docker build -t web-app -f app/Dockerfile-development app/
                 docker run -d --name web \
                     --link db:db \
                     -p 8000:8000 \
