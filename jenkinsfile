@@ -20,12 +20,13 @@ pipeline {
             steps {
                 sh '''
                 docker build -t web-app -f app/Dockerfile-development app/
-                docker run -d --name web \
+                docker run -d \
+                    --name web \
                     --link db:db \
                     -p 8000:8000 \
-                    -v $(pwd):/usr/src/app/ \
-                    -e NODE_ENV=${NODE_ENV} \
-                    -e MONGO_URL=${MONGO_URL} \
+                    -v /var/lib/jenkins/workspace/first-app:/usr/src/app \
+                    -e NODE_ENV=development \
+                    -e MONGO_URL=mongodb://db:27017/mern-starter \
                     web-app
                 '''
             }
