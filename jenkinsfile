@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_ENV = "development"
+        MONGO_URL = "mongodb://db:27017/mern-starter"
+    }
+
+    stages {
+        stage('Build DB Container') {
+            steps {
+                sh '''
+                docker pull mongo:latest
+                docker run -d --name db -p 27017:27017 mongo:latest
+                '''
+            }
+        }
+
+        stage('Build Web Container') {
+            steps {
+                sh '''
+                docker build -t web-app -f Dockerfile-development .
+                docker run -d --name web \
+                    --link db:db \
+                    -p 8000:8000 \
+                    -v $(pwd):/usr/src/app/ \
+                    -e NODE_ENV=${NODE_ENV} \
+                    -e MONGO_URL=${MONGO_URL} \
+                    web-app
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            mail to: 'hassanomar4700@gmail.com',
+                 subject: "Jenkins Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: """Good news 🎉
+                 
+The Jenkins build ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded.
+Check details here: ${env.BUILD_URL}
+"""
+        }
+        always {
+            sh '''
+            docker stop web db || true
+            docker rm web db || true
+            '''
+        }
+    }
+}
